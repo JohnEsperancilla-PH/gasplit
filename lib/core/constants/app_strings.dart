@@ -15,4 +15,21 @@ class AppStrings {
   static const homeHistoryTitle = 'Trip History';
   static const homeHistoryCta = 'View all';
   static const homeEmptyState = 'No trips yet. Start your first trip today.';
+
+  static const startTripTitle = 'Start Journey';
+  static const startTripMapTitle = 'Current location';
+  static const startTripMapHint = 'Map preview and live GPS pin appear here.';
+  static const startTripVehicleDetails = 'Vehicle details';
+  static const startTripFuelLabel = 'Fuel efficiency (km/L)';
+  static const startTripGasPriceLabel = 'Gas price (PHP/L)';
+  static const startTripPassengersTitle = 'Number of passengers';
+  static const startTripCustomPassengersLabel = 'Exact passenger count';
+  static const startTripButton = 'Start Trip';
+  static const startTripValidationFuel =
+      'Fuel efficiency must be greater than 0.';
+  static const startTripValidationGas = 'Gas price must be greater than 0.';
+  static const startTripValidationPassengers =
+      'Select passenger count before starting.';
+  static const startTripValidationCustomPassengers =
+      'Enter a valid passenger count.';
 }
