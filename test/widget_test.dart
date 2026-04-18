@@ -14,7 +14,7 @@ void main() {
     expect(find.text(AppStrings.authEmailButton), findsOneWidget);
   });
 
-  testWidgets('google button navigates to home placeholder', (
+  testWidgets('google button navigates to home screen', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
@@ -23,8 +23,24 @@ void main() {
     await tester.tap(find.text(AppStrings.authGoogleButton));
     await tester.pumpAndSettle();
 
+    expect(find.text(AppStrings.homeStartTripButton), findsOneWidget);
+    expect(find.text(AppStrings.homeHistoryTitle), findsOneWidget);
+  });
+
+  testWidgets('home start trip button navigates to start trip screen', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.homeStartTripButton));
+    await tester.pumpAndSettle();
+
     expect(
-      find.text('Trip history and quick start action will appear here.'),
+      find.text('Trip setup inputs and map preview will live here.'),
       findsOneWidget,
     );
   });

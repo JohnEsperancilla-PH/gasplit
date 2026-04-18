@@ -10,29 +10,31 @@ import '../../presentation/screens/trip/trip_summary_screen.dart';
 class AppRouter {
   const AppRouter._();
 
-  static final router = GoRouter(
-    routes: [
-      GoRoute(path: '/', builder: (context, state) => const AuthScreen()),
-      GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-      GoRoute(
-        path: '/trip/start',
-        builder: (context, state) => const StartTripScreen(),
-      ),
-      GoRoute(
-        path: '/trip/live',
-        builder: (context, state) => const LiveMeterScreen(),
-      ),
-      GoRoute(
-        path: '/trip/summary/:id',
-        builder: (context, state) {
-          final tripId = state.pathParameters['id'] ?? '';
-          return TripSummaryScreen(tripId: tripId);
-        },
-      ),
-      GoRoute(
-        path: '/history',
-        builder: (context, state) => const HistoryScreen(),
-      ),
-    ],
-  );
+  static GoRouter createRouter() {
+    return GoRouter(
+      routes: [
+        GoRoute(path: '/', builder: (context, state) => const AuthScreen()),
+        GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+        GoRoute(
+          path: '/trip/start',
+          builder: (context, state) => const StartTripScreen(),
+        ),
+        GoRoute(
+          path: '/trip/live',
+          builder: (context, state) => const LiveMeterScreen(),
+        ),
+        GoRoute(
+          path: '/trip/summary/:id',
+          builder: (context, state) {
+            final tripId = state.pathParameters['id'] ?? '';
+            return TripSummaryScreen(tripId: tripId);
+          },
+        ),
+        GoRoute(
+          path: '/history',
+          builder: (context, state) => const HistoryScreen(),
+        ),
+      ],
+    );
+  }
 }

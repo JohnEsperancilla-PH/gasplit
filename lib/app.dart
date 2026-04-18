@@ -12,7 +12,7 @@ class GaSplitApp extends StatelessWidget {
       title: 'GaSplit',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
-      routerConfig: AppRouter.router,
+      routerConfig: AppRouter.createRouter(),
     );
   }
 }
