@@ -4,6 +4,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gasplit/app.dart';
 import 'package:gasplit/core/constants/app_strings.dart';
 
+Future<void> _pumpUntilFound(
+  WidgetTester tester,
+  Finder finder, {
+  int maxPumps = 20,
+  Duration step = const Duration(milliseconds: 100),
+}) async {
+  for (var i = 0; i < maxPumps; i++) {
+    await tester.pump(step);
+    if (finder.evaluate().isNotEmpty) {
+      return;
+    }
+  }
+}
+
 void main() {
   testWidgets('shows auth UI content on startup', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
@@ -37,10 +51,54 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text(AppStrings.homeStartTripButton));
+    await _pumpUntilFound(tester, find.text(AppStrings.startTripTitle));
+
+    expect(find.text(AppStrings.startTripTitle), findsOneWidget);
+    expect(find.text(AppStrings.startTripFuelLabel), findsOneWidget);
+    expect(find.text(AppStrings.startTripGasPriceLabel), findsOneWidget);
+  });
+
+  testWidgets('start trip shows validation when passenger is not selected', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.homeStartTripButton));
+    await _pumpUntilFound(tester, find.text(AppStrings.startTripTitle));
+
+    await tester.tap(find.text(AppStrings.startTripButton));
+    await tester.pump();
+
+    expect(find.text(AppStrings.startTripValidationPassengers), findsWidgets);
+  });
+
+  testWidgets('start trip navigates to live screen when form is valid', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.homeStartTripButton));
+    await _pumpUntilFound(tester, find.text(AppStrings.startTripTitle));
+
+    await tester.tap(find.text('3'));
+    await tester.pump();
+
+    await tester.tap(find.text(AppStrings.startTripButton));
+    await _pumpUntilFound(
+      tester,
+      find.text('Live distance, speed, duration, and cost will appear here.'),
+    );
+
     expect(
-      find.text('Trip setup inputs and map preview will live here.'),
+      find.text('Live distance, speed, duration, and cost will appear here.'),
       findsOneWidget,
     );
   });
