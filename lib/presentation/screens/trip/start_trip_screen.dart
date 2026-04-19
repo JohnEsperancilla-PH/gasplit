@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/models/trip_session_config.dart';
+import '../../../providers/trip_provider.dart';
 
 const int _customPassengerOption = -1;
 
-class StartTripScreen extends StatefulWidget {
+class StartTripScreen extends ConsumerStatefulWidget {
   const StartTripScreen({super.key});
 
   @override
-  State<StartTripScreen> createState() => _StartTripScreenState();
+  ConsumerState<StartTripScreen> createState() => _StartTripScreenState();
 }
 
-class _StartTripScreenState extends State<StartTripScreen>
+class _StartTripScreenState extends ConsumerState<StartTripScreen>
     with SingleTickerProviderStateMixin {
   final TextEditingController _fuelController = TextEditingController(
     text: '12',
@@ -146,7 +148,7 @@ class _StartTripScreenState extends State<StartTripScreen>
     );
   }
 
-  void _onStartTrip() {
+  Future<void> _onStartTrip() async {
     final fuelEfficiency = double.tryParse(_fuelController.text.trim());
     final gasPrice = double.tryParse(_gasPriceController.text.trim());
 
@@ -174,14 +176,20 @@ class _StartTripScreenState extends State<StartTripScreen>
     if (!mounted) {
       return;
     }
-    context.go(
-      '/trip/live',
-      extra: TripSessionConfig(
-        fuelEfficiencyKmPerLiter: fuelEfficiency,
-        gasPricePerLiter: gasPrice,
-        passengerCount: resolvedPassengerCount,
-      ),
+
+    final config = TripSessionConfig(
+      fuelEfficiencyKmPerLiter: fuelEfficiency,
+      gasPricePerLiter: gasPrice,
+      passengerCount: resolvedPassengerCount,
     );
+
+    await ref.read(tripProvider.notifier).startTrip(config);
+
+    if (!mounted) {
+      return;
+    }
+
+    context.go('/trip/live', extra: config);
   }
 
   int? _resolvePassengerCount() {
