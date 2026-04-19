@@ -1,70 +1,50 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/models/trip_session_config.dart';
-import '../../../data/models/trip_summary_data.dart';
+import '../../../providers/trip_provider.dart';
 
-class LiveMeterScreen extends StatefulWidget {
+class LiveMeterScreen extends ConsumerStatefulWidget {
   const LiveMeterScreen({required this.config, super.key});
 
   final TripSessionConfig config;
 
   @override
-  State<LiveMeterScreen> createState() => _LiveMeterScreenState();
+  ConsumerState<LiveMeterScreen> createState() => _LiveMeterScreenState();
 }
 
-class _LiveMeterScreenState extends State<LiveMeterScreen>
+class _LiveMeterScreenState extends ConsumerState<LiveMeterScreen>
     with SingleTickerProviderStateMixin {
-  final Stopwatch _tripStopwatch = Stopwatch();
-  final Random _random = Random();
-
   late final AnimationController _pulseController;
-  Timer? _tickTimer;
-  late final DateTime _startedAt;
-
-  double _distanceKm = 0;
-  double _speedKmh = 0;
-
-  double get _gasUsedLiters {
-    final fuelEfficiency = widget.config.fuelEfficiencyKmPerLiter;
-    if (fuelEfficiency <= 0) {
-      return 0;
-    }
-    return _distanceKm / fuelEfficiency;
-  }
-
-  double get _totalCost => _gasUsedLiters * widget.config.gasPricePerLiter;
-
-  double get _perPersonShare {
-    if (widget.config.passengerCount <= 0) {
-      return 0;
-    }
-    return _totalCost / widget.config.passengerCount;
-  }
+  late final DateTime _screenOpenedAt;
 
   @override
   void initState() {
     super.initState();
-    _startedAt = DateTime.now();
-    _tripStopwatch.start();
+    _screenOpenedAt = DateTime.now();
 
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
     )..repeat(reverse: true);
 
-    _tickTimer = Timer.periodic(const Duration(seconds: 1), _onTick);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+
+      final currentTrip = ref.read(tripProvider);
+      if (!currentTrip.isActive) {
+        ref.read(tripProvider.notifier).startTrip(widget.config);
+      }
+    });
   }
 
   @override
   void dispose() {
-    _tickTimer?.cancel();
-    _tripStopwatch.stop();
     _pulseController.dispose();
     super.dispose();
   }
@@ -72,6 +52,8 @@ class _LiveMeterScreenState extends State<LiveMeterScreen>
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final tripState = ref.watch(tripProvider);
+    final startedAt = tripState.startedAt ?? _screenOpenedAt;
 
     return Scaffold(
       appBar: AppBar(
@@ -93,14 +75,14 @@ class _LiveMeterScreenState extends State<LiveMeterScreen>
                         _LiveBadge(pulseController: _pulseController),
                         const Spacer(),
                         Text(
-                          '${AppStrings.liveMeterStartedLabel}: ${_formatStartedTime(_startedAt)}',
+                          '${AppStrings.liveMeterStartedLabel}: ${_formatStartedTime(startedAt)}',
                           style: textTheme.bodyMedium,
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      _formatPeso(_totalCost),
+                      _formatPeso(tripState.totalCost),
                       style: textTheme.titleLarge?.copyWith(
                         fontSize: 38,
                         fontWeight: FontWeight.w600,
@@ -126,29 +108,31 @@ class _LiveMeterScreenState extends State<LiveMeterScreen>
                         Expanded(
                           child: _StatCard(
                             label: AppStrings.liveMeterDistanceLabel,
-                            value: '${_distanceKm.toStringAsFixed(2)} km',
+                            value:
+                                '${tripState.distanceKm.toStringAsFixed(2)} km',
                           ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: _StatCard(
                             label: AppStrings.liveMeterSpeedLabel,
-                            value: '${_speedKmh.toStringAsFixed(1)} km/h',
+                            value:
+                                '${tripState.speedKmh.toStringAsFixed(1)} km/h',
                           ),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: _StatCard(
                             label: AppStrings.liveMeterDurationLabel,
-                            value: _formatDuration(_tripStopwatch.elapsed),
+                            value: _formatDuration(tripState.duration),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 14),
                     _PassengerSplitCard(
-                      passengerCount: widget.config.passengerCount,
-                      perPersonShareText: _formatPeso(_perPersonShare),
+                      passengerCount: tripState.passengerCount,
+                      perPersonShareText: _formatPeso(tripState.perPersonShare),
                     ),
                   ],
                 ),
@@ -174,20 +158,6 @@ class _LiveMeterScreenState extends State<LiveMeterScreen>
         ),
       ),
     );
-  }
-
-  void _onTick(Timer timer) {
-    if (!mounted) {
-      return;
-    }
-
-    final distanceIncrementKm = 0.0035 + (_random.nextDouble() * 0.0065);
-    final speed = (distanceIncrementKm * 3600).clamp(0.0, 120.0).toDouble();
-
-    setState(() {
-      _distanceKm += distanceIncrementKm;
-      _speedKmh = speed;
-    });
   }
 
   Future<void> _onEndTripPressed() async {
@@ -219,27 +189,17 @@ class _LiveMeterScreenState extends State<LiveMeterScreen>
       return;
     }
 
-    final endedAt = DateTime.now();
-    final tripId = 'trip_${endedAt.millisecondsSinceEpoch}';
-    final summaryData = TripSummaryData(
-      tripId: tripId,
-      routeLabel: 'Current route',
-      startedAt: _startedAt,
-      endedAt: endedAt,
-      distanceKm: _distanceKm,
-      duration: _tripStopwatch.elapsed,
-      fuelEfficiencyKmPerLiter: widget.config.fuelEfficiencyKmPerLiter,
-      gasPricePerLiter: widget.config.gasPricePerLiter,
-      gasUsedLiters: _gasUsedLiters,
-      totalCost: _totalCost,
-      passengerCount: widget.config.passengerCount,
-      perPersonShare: _perPersonShare,
-    );
+    final summaryData = await ref.read(tripProvider.notifier).endTrip();
+    if (summaryData == null || !mounted) {
+      return;
+    }
 
-    context.go('/trip/summary/$tripId', extra: summaryData);
+    context.go('/trip/summary/${summaryData.tripId}', extra: summaryData);
   }
 
   void _showFormulaBottomSheet() {
+    final tripState = ref.read(tripProvider);
+
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -258,31 +218,31 @@ class _LiveMeterScreenState extends State<LiveMeterScreen>
                 const SizedBox(height: 10),
                 _FormulaRow(
                   label: AppStrings.liveMeterFormulaGasUsed,
-                  value: '${_gasUsedLiters.toStringAsFixed(2)} L',
+                  value: '${tripState.gasUsedLiters.toStringAsFixed(2)} L',
                 ),
                 _FormulaRow(
                   label: AppStrings.liveMeterFormulaFuel,
                   value:
-                      '${widget.config.fuelEfficiencyKmPerLiter.toStringAsFixed(1)} km/L',
+                      '${tripState.fuelEfficiencyKmPerLiter.toStringAsFixed(1)} km/L',
                 ),
                 _FormulaRow(
                   label: AppStrings.liveMeterFormulaGasPrice,
                   value:
-                      'PHP ${widget.config.gasPricePerLiter.toStringAsFixed(2)} /L',
+                      'PHP ${tripState.gasPricePerLiter.toStringAsFixed(2)} /L',
                 ),
                 _FormulaRow(
                   label: AppStrings.liveMeterFormulaPassengerCount,
-                  value: '${widget.config.passengerCount}',
+                  value: '${tripState.passengerCount}',
                 ),
                 const Divider(height: 24),
                 _FormulaRow(
                   label: AppStrings.liveMeterFormulaTotal,
-                  value: _formatPeso(_totalCost),
+                  value: _formatPeso(tripState.totalCost),
                   emphasize: true,
                 ),
                 _FormulaRow(
                   label: AppStrings.liveMeterFormulaPerPerson,
-                  value: _formatPeso(_perPersonShare),
+                  value: _formatPeso(tripState.perPersonShare),
                   emphasize: true,
                 ),
               ],

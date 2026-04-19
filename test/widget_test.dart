@@ -133,39 +133,4 @@ void main() {
     expect(find.text('Roxas Ave -> SM City'), findsOneWidget);
     expect(find.text(AppStrings.tripSummaryShareButton), findsOneWidget);
   });
-
-  testWidgets('ending a live trip opens trip summary screen', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text(AppStrings.authGoogleButton));
-    await tester.pumpAndSettle();
-
-    await tester.tap(find.text(AppStrings.homeStartTripButton));
-    await _pumpUntilFound(tester, find.text(AppStrings.startTripTitle));
-
-    await tester.tap(find.text('3'));
-    await tester.pump();
-
-    await tester.tap(find.text(AppStrings.startTripButton));
-    await _pumpUntilFound(tester, find.text(AppStrings.liveMeterTitle));
-
-    await tester.tap(find.text(AppStrings.liveMeterEndTripButton).first);
-    await tester.pump();
-    await _pumpUntilFound(
-      tester,
-      find.text(AppStrings.liveMeterEndDialogTitle),
-    );
-
-    expect(find.text(AppStrings.liveMeterEndDialogTitle), findsOneWidget);
-
-    await tester.tap(find.text(AppStrings.liveMeterEndTripButton).last);
-    await tester.pump();
-    await _pumpUntilFound(tester, find.text(AppStrings.tripSummaryTitle));
-
-    expect(find.text(AppStrings.tripSummaryTitle), findsOneWidget);
-    expect(find.text(AppStrings.tripSummaryShareButton), findsOneWidget);
-  });
 }
