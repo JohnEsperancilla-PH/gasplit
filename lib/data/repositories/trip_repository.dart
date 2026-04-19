@@ -104,4 +104,8 @@ class TripRepository {
   Future<List<TripSummaryData>> fetchCompletedTrips() {
     return _firestoreService.fetchCompletedTrips();
   }
+
+  Future<void> saveTripSummary(TripSummaryData summary) {
+    return _firestoreService.saveCompletedTrip(summary);
+  }
 }

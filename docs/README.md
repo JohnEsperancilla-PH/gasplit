@@ -51,7 +51,7 @@ Last updated: April 19, 2026
 | History (`/history`) | Done | Search/filter, pull-to-refresh, summary navigation |
 | Live meter (`/trip/live`) | Done | Real-time UI, formula sheet, passenger split, end-trip flow |
 | Trip summary (`/trip/summary/:tripId`) | Done | Hero, details, passenger breakdown, share/save actions |
-| Firebase/GPS service wiring | In Progress | Provider/repository/services connected with simulated GPS and local persistence stubs |
+| Firebase/GPS service wiring | In Progress | Trip/history providers connected with simulated GPS, in-memory persistence stubs, and save-to-history wiring |
 
 ---
 
