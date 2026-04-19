@@ -92,15 +92,10 @@ void main() {
     await tester.pump();
 
     await tester.tap(find.text(AppStrings.startTripButton));
-    await _pumpUntilFound(
-      tester,
-      find.text('Live distance, speed, duration, and cost will appear here.'),
-    );
+    await _pumpUntilFound(tester, find.text(AppStrings.liveMeterTitle));
 
-    expect(
-      find.text('Live distance, speed, duration, and cost will appear here.'),
-      findsOneWidget,
-    );
+    expect(find.text(AppStrings.liveMeterTitle), findsOneWidget);
+    expect(find.text(AppStrings.liveMeterEndTripButton), findsOneWidget);
   });
 
   testWidgets('view all navigates to history screen', (

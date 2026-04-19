@@ -90,7 +90,7 @@ Where the driver configures the trip before departure.
 
 **Route:** `/trip/live`
 
-**Status:** Pending (placeholder screen currently)
+**Status:** Implemented (UI + simulated live meter updates)
 
 The core screen of the app. Displays the live gas meter and per-person split.
 

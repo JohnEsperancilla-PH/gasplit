@@ -13,7 +13,7 @@ Last updated: April 19, 2026
 | Home screen | Done | Greeting, start-trip CTA, history CTA |
 | Start Journey screen | Done | Form inputs, passenger selector, validation, live-route navigation |
 | History screen | Done | Search/filter, list, refresh, summary-route navigation |
-| Live meter screen | Pending | Placeholder only |
+| Live meter screen | Done | Real-time UI, formula sheet, passenger split, end-trip flow |
 | Trip summary screen | Pending | Placeholder only |
 | Firebase/GPS data integration | Pending | Planned in service/repository layers |
 

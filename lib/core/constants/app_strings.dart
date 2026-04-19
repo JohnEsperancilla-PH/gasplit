@@ -33,6 +33,33 @@ class AppStrings {
   static const startTripValidationCustomPassengers =
       'Enter a valid passenger count.';
 
+  static const liveMeterTitle = 'Live Trip Meter';
+  static const liveMeterMapHint = 'Route map and live markers appear here.';
+  static const liveMeterLiveLabel = 'Live';
+  static const liveMeterStartedLabel = 'Started';
+  static const liveMeterTotalCostLabel = 'Total gas cost';
+  static const liveMeterFormulaHint = 'tap to view formula';
+  static const liveMeterDistanceLabel = 'Distance';
+  static const liveMeterSpeedLabel = 'Speed';
+  static const liveMeterDurationLabel = 'Duration';
+  static const liveMeterPerPersonTitle = 'Per-person share';
+  static const liveMeterPassengersSuffix = 'passengers';
+  static const liveMeterDriverLabel = 'You';
+  static const liveMeterPassengerLabel = 'Passenger';
+  static const liveMeterEndTripButton = 'End Trip';
+  static const liveMeterEndDialogTitle = 'End this trip?';
+  static const liveMeterEndDialogMessage =
+      'This will stop live updates and open the trip summary.';
+  static const liveMeterFormulaTitle = 'Gas Formula';
+  static const liveMeterFormulaGasUsed = 'Gas used';
+  static const liveMeterFormulaFuel = 'Fuel efficiency';
+  static const liveMeterFormulaGasPrice = 'Gas price';
+  static const liveMeterFormulaPassengerCount = 'Passengers';
+  static const liveMeterFormulaTotal = 'Total cost';
+  static const liveMeterFormulaPerPerson = 'Per-person share';
+
+  static const commonCancel = 'Cancel';
+
   static const historyTitle = 'Trip History';
   static const historySearchHint = 'Search by date or route';
   static const historyEmptyFiltered = 'No trips match your search.';
