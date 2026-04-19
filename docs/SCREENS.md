@@ -8,6 +8,8 @@ A screen-by-screen breakdown of GaSplit's UI, features, and navigation behavior.
 
 **Route:** `/`
 
+**Status:** Implemented (UI + navigation stub)
+
 The entry point of the app. Shows the brand hero and login options. If the user is already authenticated, they are redirected to `/home` immediately.
 
 ### UI Elements
@@ -39,6 +41,8 @@ Each tile shows:
 
 **Route:** `/home`
 
+**Status:** Implemented (UI + navigation)
+
 The main hub after login. Shows a summary of past trips and the primary call-to-action to start a new trip.
 
 ### UI Elements
@@ -53,6 +57,8 @@ The main hub after login. Shows a summary of past trips and the primary call-to-
 ## 3. Start Journey Screen
 
 **Route:** `/trip/start`
+
+**Status:** Implemented (form + validation + navigation)
 
 Where the driver configures the trip before departure.
 
@@ -83,6 +89,8 @@ Where the driver configures the trip before departure.
 ## 4. Live Trip Meter Screen
 
 **Route:** `/trip/live`
+
+**Status:** Pending (placeholder screen currently)
 
 The core screen of the app. Displays the live gas meter and per-person split.
 
@@ -128,6 +136,8 @@ The core screen of the app. Displays the live gas meter and per-person split.
 
 **Route:** `/trip/summary/:tripId`
 
+**Status:** Pending (placeholder screen currently)
+
 Shown immediately after a trip ends, and also accessible from history.
 
 ### UI Elements
@@ -171,6 +181,8 @@ Powered by GaSplit
 
 **Route:** `/history`
 
+**Status:** Implemented (search, list, refresh, and summary navigation)
+
 A full list of all completed trips for the logged-in driver.
 
 ### UI Elements
@@ -193,6 +205,8 @@ A full list of all completed trips for the logged-in driver.
 ---
 
 ## Formula Bottom Sheet
+
+**Status:** Pending (not yet implemented)
 
 Accessible by tapping the total cost on the Live Meter screen.
 

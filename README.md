@@ -1,16 +1,25 @@
-# gasplit
+# GaSplit
 
-A new Flutter project.
+GaSplit is a Flutter app that helps drivers track trip distance and split gas costs among passengers.
 
-## Getting Started
+## Progress Snapshot
 
-This project is a starting point for a Flutter application.
+Last updated: April 19, 2026
 
-A few resources to get you started if this is your first Flutter project:
+| Area | Status | Notes |
+|---|---|---|
+| App shell and routing | Done | MaterialApp.router, theme setup, route map |
+| Auth screen | Done | UI, actions, recent trips preview, home navigation |
+| Home screen | Done | Greeting, start-trip CTA, history CTA |
+| Start Journey screen | Done | Form inputs, passenger selector, validation, live-route navigation |
+| History screen | Done | Search/filter, list, refresh, summary-route navigation |
+| Live meter screen | Pending | Placeholder only |
+| Trip summary screen | Pending | Placeholder only |
+| Firebase/GPS data integration | Pending | Planned in service/repository layers |
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Quick Links
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- [Project Docs](docs/README.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Screens](docs/SCREENS.md)
+- [Setup](docs/SETUP.md)
