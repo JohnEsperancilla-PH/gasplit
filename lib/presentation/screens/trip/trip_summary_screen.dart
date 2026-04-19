@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
@@ -98,63 +99,80 @@ class _TripSummaryScreenState extends ConsumerState<TripSummaryScreen> {
       showDragHandle: true,
       builder: (context) {
         return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.tripSummarySharePreviewTitle,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 10),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: SelectableText(shareText),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppStrings.tripSummarySharePreviewTitle,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const Text(AppStrings.commonClose),
-                      ),
+                  const SizedBox(height: 10),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: SelectableText(shareText),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          await Clipboard.setData(
-                            ClipboardData(text: shareText),
-                          );
-                          if (!context.mounted) {
-                            return;
-                          }
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(this.context)
-                            ..clearSnackBars()
-                            ..showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  AppStrings.tripSummaryCopiedSnack,
-                                ),
-                              ),
-                            );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryAccent,
-                          foregroundColor: AppColors.darkSurface,
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text(AppStrings.commonClose),
                         ),
-                        child: const Text(AppStrings.tripSummaryCopyButton),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () async {
+                            await Clipboard.setData(
+                              ClipboardData(text: shareText),
+                            );
+                            if (!context.mounted) {
+                              return;
+                            }
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(this.context)
+                              ..clearSnackBars()
+                              ..showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    AppStrings.tripSummaryCopiedSnack,
+                                  ),
+                                ),
+                              );
+                          },
+                          child: const Text(AppStrings.tripSummaryCopyButton),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final didShare = await _shareBreakdown(shareText);
+                        if (!context.mounted || !didShare) {
+                          return;
+                        }
+                        Navigator.of(context).pop();
+                      },
+                      icon: const Icon(Icons.share_outlined),
+                      label: const Text(AppStrings.tripSummaryShareNowButton),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryAccent,
+                        foregroundColor: AppColors.darkSurface,
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -182,6 +200,28 @@ class _TripSummaryScreenState extends ConsumerState<TripSummaryScreen> {
       ..showSnackBar(
         const SnackBar(content: Text(AppStrings.tripSummarySavedSnack)),
       );
+  }
+
+  Future<bool> _shareBreakdown(String shareText) async {
+    try {
+      await SharePlus.instance.share(
+        ShareParams(text: shareText, subject: AppStrings.tripSummaryTitle),
+      );
+      return true;
+    } catch (_) {
+      if (!mounted) {
+        return false;
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text(AppStrings.tripSummaryShareUnavailableSnack),
+          ),
+        );
+      return false;
+    }
   }
 }
 

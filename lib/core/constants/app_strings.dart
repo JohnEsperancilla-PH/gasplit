@@ -71,8 +71,11 @@ class AppStrings {
   static const tripSummarySavedButton = 'Saved to History';
   static const tripSummarySavedSnack = 'Trip saved to history.';
   static const tripSummarySharePreviewTitle = 'Share trip summary';
+  static const tripSummaryShareNowButton = 'Share now';
   static const tripSummaryCopyButton = 'Copy text';
   static const tripSummaryCopiedSnack = 'Summary text copied.';
+  static const tripSummaryShareUnavailableSnack =
+      'Unable to open share options on this device.';
   static const tripSummaryRouteFallback = 'Route unavailable';
   static const tripSummaryPoweredBy = 'Powered by GaSplit';
 

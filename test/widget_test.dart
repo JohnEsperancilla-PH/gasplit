@@ -150,4 +150,26 @@ void main() {
     expect(find.text('Roxas Ave -> SM City'), findsOneWidget);
     expect(find.text(AppStrings.tripSummaryShareButton), findsOneWidget);
   });
+
+  testWidgets('trip summary share preview shows share action', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Roxas Ave -> SM City'));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text(AppStrings.tripSummaryShareButton));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.tripSummaryShareButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.tripSummarySharePreviewTitle), findsOneWidget);
+    expect(find.text(AppStrings.tripSummaryCopyButton), findsOneWidget);
+    expect(find.text(AppStrings.tripSummaryShareNowButton), findsOneWidget);
+  });
 }
