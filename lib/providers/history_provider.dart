@@ -2,11 +2,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/models/trip_summary_data.dart';
 import '../data/repositories/trip_repository.dart';
+import 'auth_provider.dart';
 import 'trip_provider.dart';
 
 final historyProvider =
     StateNotifierProvider<HistoryNotifier, List<TripSummaryData>>((ref) {
-      final notifier = HistoryNotifier(ref.read(tripRepositoryProvider));
+      final notifier = HistoryNotifier(ref.watch(tripRepositoryProvider));
+
+      final initialUser = ref.watch(authStateProvider).valueOrNull;
+      if (initialUser != null) {
+        notifier.refresh();
+      }
+
+      ref.listen(authStateProvider, (previous, next) {
+        final previousUser = previous?.valueOrNull;
+        final nextUser = next.valueOrNull;
+        if (nextUser == null) {
+          notifier.clear();
+          return;
+        }
+
+        if (nextUser.uid != previousUser?.uid) {
+          notifier.refresh();
+        }
+      });
       return notifier;
     });
 
@@ -31,15 +50,22 @@ final recentTripsProvider = Provider<List<TripSummaryData>>((ref) {
 });
 
 class HistoryNotifier extends StateNotifier<List<TripSummaryData>> {
-  HistoryNotifier(this._tripRepository) : super(const <TripSummaryData>[]) {
-    refresh();
-  }
+  HistoryNotifier(this._tripRepository) : super(const <TripSummaryData>[]);
 
   final TripRepository _tripRepository;
 
   Future<void> refresh() async {
-    final trips = await _tripRepository.fetchCompletedTrips();
-    state = trips;
+    try {
+      final trips = await _tripRepository.fetchCompletedTrips();
+      state = trips;
+    } catch (_) {
+      // Avoid crashing when backend mode is enabled but auth is not ready yet.
+      state = const <TripSummaryData>[];
+    }
+  }
+
+  void clear() {
+    state = const <TripSummaryData>[];
   }
 
   Future<void> saveTrip(TripSummaryData trip) async {

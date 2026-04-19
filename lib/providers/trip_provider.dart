@@ -10,15 +10,34 @@ import '../data/repositories/trip_repository.dart';
 import '../data/services/firestore_service.dart';
 import '../data/services/gps_service.dart';
 import '../data/services/realtime_db_service.dart';
+import 'auth_provider.dart';
 
 final gpsServiceProvider = Provider<GpsService>((ref) {
   return GpsService(useGeolocator: kUseRealGpsStream);
 });
 
+final authenticatedUidProvider = Provider<String>((ref) {
+  final authUser = ref.watch(authStateProvider).valueOrNull;
+  if (authUser != null && authUser.uid.trim().isNotEmpty) {
+    return authUser.uid;
+  }
+  return kActiveTripDriverId;
+});
+
+final activeTripPathProvider = Provider<String>((ref) {
+  final uid = ref.watch(authenticatedUidProvider);
+  return _joinPath(<String>[kActiveTripsPath, uid]);
+});
+
+final tripsCollectionPathProvider = Provider<String>((ref) {
+  final uid = ref.watch(authenticatedUidProvider);
+  return _joinPath(<String>[kUsersCollectionPath, uid, kTripsCollectionPath]);
+});
+
 final realtimeDbServiceProvider = Provider<RealtimeDbService>((ref) {
   final service = RealtimeDbService(
     useFirebase: kUseFirebaseBackend,
-    activeTripPath: 'active_trips/$kActiveTripDriverId',
+    activeTripPath: ref.watch(activeTripPathProvider),
   );
   ref.onDispose(service.dispose);
   return service;
@@ -27,30 +46,43 @@ final realtimeDbServiceProvider = Provider<RealtimeDbService>((ref) {
 final firestoreServiceProvider = Provider<FirestoreService>(
   (ref) => FirestoreService(
     useFirestore: kUseFirebaseBackend,
-    collectionPath: kTripsCollectionPath,
+    collectionPath: ref.watch(tripsCollectionPathProvider),
   ),
 );
 
 final tripRepositoryProvider = Provider<TripRepository>((ref) {
   return TripRepository(
-    gpsService: ref.read(gpsServiceProvider),
-    realtimeDbService: ref.read(realtimeDbServiceProvider),
-    firestoreService: ref.read(firestoreServiceProvider),
+    gpsService: ref.watch(gpsServiceProvider),
+    realtimeDbService: ref.watch(realtimeDbServiceProvider),
+    firestoreService: ref.watch(firestoreServiceProvider),
   );
 });
 
 final tripProvider = StateNotifierProvider<TripNotifier, LiveTripState>((ref) {
-  final notifier = TripNotifier(repository: ref.read(tripRepositoryProvider));
+  final notifier = TripNotifier(repository: ref.watch(tripRepositoryProvider));
   return notifier;
 });
 
 class TripNotifier extends StateNotifier<LiveTripState> {
   TripNotifier({required TripRepository repository})
     : _repository = repository,
-      super(const LiveTripState());
+      super(const LiveTripState()) {
+    _restoreActiveTrip();
+  }
 
   final TripRepository _repository;
   StreamSubscription<GpsTick>? _gpsSubscription;
+
+  Future<void> _restoreActiveTrip() async {
+    try {
+      final activeTrip = await _repository.watchActiveTrip().first;
+      if (activeTrip != null && activeTrip.isActive) {
+        state = activeTrip;
+      }
+    } catch (_) {
+      // Fallback mode may not have a persisted active trip.
+    }
+  }
 
   Future<void> startTrip(
     TripSessionConfig config, {
@@ -96,4 +128,11 @@ class TripNotifier extends StateNotifier<LiveTripState> {
     _gpsSubscription?.cancel();
     super.dispose();
   }
+}
+
+String _joinPath(List<String> segments) {
+  return segments
+      .map((segment) => segment.trim())
+      .where((segment) => segment.isNotEmpty)
+      .join('/');
 }
