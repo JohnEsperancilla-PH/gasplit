@@ -182,6 +182,26 @@ void main() {
     expect(find.text(AppStrings.tripSummaryShareButton), findsOneWidget);
   });
 
+  testWidgets('history passenger filter narrows visible trips', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.homeHistoryCta));
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text(AppStrings.historyFilter5Plus));
+    await tester.tap(find.text(AppStrings.historyFilter5Plus));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Azuela Cove -> Buhangin'), findsOneWidget);
+    expect(find.text('Roxas Ave -> SM City'), findsNothing);
+  });
+
   testWidgets('trip summary share preview shows share action', (
     WidgetTester tester,
   ) async {

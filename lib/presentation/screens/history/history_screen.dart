@@ -19,6 +19,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   int _visibleCount = 5;
   int _latestFilteredCount = 0;
+  _PassengerFilter _selectedPassengerFilter = _PassengerFilter.all;
+  bool _sortNewestFirst = true;
 
   @override
   void initState() {
@@ -35,15 +37,46 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
   List<TripSummaryData> _filterTrips(List<TripSummaryData> trips) {
     final query = _searchController.text.trim().toLowerCase();
-    if (query.isEmpty) {
-      return trips;
-    }
+    final filtered =
+        trips
+            .where((trip) {
+              final route = _routeLabel(trip).toLowerCase();
+              final date = _formatDateTime(trip.endedAt).toLowerCase();
+              final total = _formatPeso(trip.totalCost).toLowerCase();
+              final perPerson = _formatPeso(trip.perPersonShare).toLowerCase();
+              final passengerText = '${trip.passengerCount} pax';
+              final matchesQuery =
+                  query.isEmpty ||
+                  route.contains(query) ||
+                  date.contains(query) ||
+                  total.contains(query) ||
+                  perPerson.contains(query) ||
+                  passengerText.contains(query);
 
-    return trips.where((trip) {
-      final route = _routeLabel(trip).toLowerCase();
-      final date = _formatDateTime(trip.endedAt).toLowerCase();
-      return route.contains(query) || date.contains(query);
-    }).toList();
+              return matchesQuery && _matchesPassengerFilter(trip);
+            })
+            .toList(growable: false)
+          ..sort((a, b) {
+            if (_sortNewestFirst) {
+              return b.endedAt.compareTo(a.endedAt);
+            }
+            return a.endedAt.compareTo(b.endedAt);
+          });
+
+    return filtered;
+  }
+
+  bool _matchesPassengerFilter(TripSummaryData trip) {
+    switch (_selectedPassengerFilter) {
+      case _PassengerFilter.all:
+        return true;
+      case _PassengerFilter.upTo2:
+        return trip.passengerCount <= 2;
+      case _PassengerFilter.between3And4:
+        return trip.passengerCount >= 3 && trip.passengerCount <= 4;
+      case _PassengerFilter.atLeast5:
+        return trip.passengerCount >= 5;
+    }
   }
 
   @override
@@ -72,6 +105,88 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   prefixIcon: Icon(Icons.search_rounded),
                   border: OutlineInputBorder(),
                 ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          _PassengerFilterChip(
+                            label: AppStrings.historyFilterAll,
+                            selected:
+                                _selectedPassengerFilter ==
+                                _PassengerFilter.all,
+                            onSelected: () {
+                              setState(() {
+                                _selectedPassengerFilter = _PassengerFilter.all;
+                                _visibleCount = 5;
+                              });
+                            },
+                          ),
+                          _PassengerFilterChip(
+                            label: AppStrings.historyFilterUpTo2,
+                            selected:
+                                _selectedPassengerFilter ==
+                                _PassengerFilter.upTo2,
+                            onSelected: () {
+                              setState(() {
+                                _selectedPassengerFilter =
+                                    _PassengerFilter.upTo2;
+                                _visibleCount = 5;
+                              });
+                            },
+                          ),
+                          _PassengerFilterChip(
+                            label: AppStrings.historyFilter3to4,
+                            selected:
+                                _selectedPassengerFilter ==
+                                _PassengerFilter.between3And4,
+                            onSelected: () {
+                              setState(() {
+                                _selectedPassengerFilter =
+                                    _PassengerFilter.between3And4;
+                                _visibleCount = 5;
+                              });
+                            },
+                          ),
+                          _PassengerFilterChip(
+                            label: AppStrings.historyFilter5Plus,
+                            selected:
+                                _selectedPassengerFilter ==
+                                _PassengerFilter.atLeast5,
+                            onSelected: () {
+                              setState(() {
+                                _selectedPassengerFilter =
+                                    _PassengerFilter.atLeast5;
+                                _visibleCount = 5;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _sortNewestFirst = !_sortNewestFirst;
+                        _visibleCount = 5;
+                      });
+                    },
+                    icon: Icon(
+                      _sortNewestFirst
+                          ? Icons.arrow_downward_rounded
+                          : Icons.arrow_upward_rounded,
+                    ),
+                    tooltip: _sortNewestFirst
+                        ? AppStrings.historySortNewestTooltip
+                        : AppStrings.historySortOldestTooltip,
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
               Expanded(
@@ -145,6 +260,32 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     setState(() {
       _visibleCount = 5;
     });
+  }
+}
+
+enum _PassengerFilter { all, upTo2, between3And4, atLeast5 }
+
+class _PassengerFilterChip extends StatelessWidget {
+  const _PassengerFilterChip({
+    required this.label,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(
+        label: Text(label),
+        selected: selected,
+        onSelected: (_) => onSelected(),
+      ),
+    );
   }
 }
 

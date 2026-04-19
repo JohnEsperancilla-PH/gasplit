@@ -92,6 +92,12 @@ class AppStrings {
 
   static const historyTitle = 'Trip History';
   static const historySearchHint = 'Search by date or route';
+  static const historyFilterAll = 'All';
+  static const historyFilterUpTo2 = '1-2 pax';
+  static const historyFilter3to4 = '3-4 pax';
+  static const historyFilter5Plus = '5+ pax';
+  static const historySortNewestTooltip = 'Sort: newest first';
+  static const historySortOldestTooltip = 'Sort: oldest first';
   static const historyEmptyFiltered = 'No trips match your search.';
   static const historyEmptyAll = 'No trips saved yet.';
   static const historyPassengersLabel = 'Passengers';
