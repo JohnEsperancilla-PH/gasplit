@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:gasplit/app.dart';
@@ -41,6 +41,47 @@ void main() {
 
     expect(find.text(AppStrings.homeStartTripButton), findsOneWidget);
     expect(find.text(AppStrings.homeHistoryTitle), findsOneWidget);
+  });
+
+  testWidgets('email sign-in sheet navigates to home screen', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authEmailButton));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.widgetWithText(TextFormField, AppStrings.authEmailFieldLabel),
+      'driver@example.com',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextFormField, AppStrings.authPasswordFieldLabel),
+      'password123',
+    );
+
+    await tester.tap(find.text(AppStrings.authSignInAction));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.homeStartTripButton), findsOneWidget);
+    expect(find.text(AppStrings.homeHistoryTitle), findsOneWidget);
+  });
+
+  testWidgets('logout button signs out and returns to auth', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip(AppStrings.homeLogoutTooltip));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.authTitle), findsOneWidget);
+    expect(find.text(AppStrings.authGoogleButton), findsOneWidget);
   });
 
   testWidgets('home start trip button navigates to start trip screen', (

@@ -7,6 +7,18 @@ class AppStrings {
   static const authTitle = 'Driver Login';
   static const authGoogleButton = 'Continue with Google';
   static const authEmailButton = 'Sign in with Email/Password';
+  static const authCheckingSessionLabel = 'Checking session...';
+  static const authEmailDialogTitle = 'Email Authentication';
+  static const authEmailFieldLabel = 'Email';
+  static const authPasswordFieldLabel = 'Password';
+  static const authSignInAction = 'Sign In';
+  static const authCreateAccountAction = 'Create Account';
+  static const authValidationEmail = 'Enter a valid email address.';
+  static const authValidationPassword =
+      'Password must be at least 6 characters.';
+  static const authGoogleCancelledSnack = 'Google sign-in was canceled.';
+  static const authSignInFailedPrefix = 'Sign-in failed';
+  static const authSignedOutSnack = 'Signed out.';
   static const authRecentTripsTitle = 'Recent Trips';
   static const authRecentTripsSubtitle = 'Last 3 completed trips';
 
@@ -21,6 +33,7 @@ class AppStrings {
   static const homeHistoryTitle = 'Trip History';
   static const homeHistoryCta = 'View all';
   static const homeEmptyState = 'No trips yet. Start your first trip today.';
+  static const homeLogoutTooltip = 'Logout';
 
   static const startTripTitle = 'Start Journey';
   static const startTripMapTitle = 'Current location';
