@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import '../../data/models/trip_session_config.dart';
 import '../../presentation/screens/auth/auth_screen.dart';
 import '../../presentation/screens/history/history_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
@@ -21,7 +22,16 @@ class AppRouter {
         ),
         GoRoute(
           path: '/trip/live',
-          builder: (context, state) => const LiveMeterScreen(),
+          builder: (context, state) {
+            final config = state.extra is TripSessionConfig
+                ? state.extra! as TripSessionConfig
+                : const TripSessionConfig(
+                    fuelEfficiencyKmPerLiter: 12,
+                    gasPricePerLiter: 65,
+                    passengerCount: 3,
+                  );
+            return LiveMeterScreen(config: config);
+          },
         ),
         GoRoute(
           path: '/trip/summary/:id',

@@ -49,7 +49,7 @@ Last updated: April 19, 2026
 | Home screen (`/home`) | Done | CTA actions, trip preview cards, navigation |
 | Start Journey (`/trip/start`) | Done | Inputs, passenger selector, validation, live navigation |
 | History (`/history`) | Done | Search/filter, pull-to-refresh, summary navigation |
-| Live meter (`/trip/live`) | Pending | Placeholder only |
+| Live meter (`/trip/live`) | Done | Real-time UI, formula sheet, passenger split, end-trip flow |
 | Trip summary (`/trip/summary/:tripId`) | Pending | Placeholder only |
 | Firebase service wiring | Pending | Planned for provider/repository integration |
 

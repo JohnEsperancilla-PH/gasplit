@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../data/models/trip_session_config.dart';
 
 const int _customPassengerOption = -1;
 
@@ -173,7 +174,14 @@ class _StartTripScreenState extends State<StartTripScreen>
     if (!mounted) {
       return;
     }
-    context.go('/trip/live');
+    context.go(
+      '/trip/live',
+      extra: TripSessionConfig(
+        fuelEfficiencyKmPerLiter: fuelEfficiency,
+        gasPricePerLiter: gasPrice,
+        passengerCount: resolvedPassengerCount,
+      ),
+    );
   }
 
   int? _resolvePassengerCount() {
