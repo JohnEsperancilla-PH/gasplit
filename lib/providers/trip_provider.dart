@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/constants/backend_config.dart';
 import '../data/models/live_trip_state.dart';
 import '../data/models/trip_session_config.dart';
 import '../data/models/trip_summary_data.dart';
@@ -10,16 +11,24 @@ import '../data/services/firestore_service.dart';
 import '../data/services/gps_service.dart';
 import '../data/services/realtime_db_service.dart';
 
-final gpsServiceProvider = Provider<GpsService>((ref) => GpsService());
+final gpsServiceProvider = Provider<GpsService>((ref) {
+  return GpsService(useGeolocator: kUseRealGpsStream);
+});
 
 final realtimeDbServiceProvider = Provider<RealtimeDbService>((ref) {
-  final service = RealtimeDbService();
+  final service = RealtimeDbService(
+    useFirebase: kUseFirebaseBackend,
+    activeTripPath: 'active_trips/$kActiveTripDriverId',
+  );
   ref.onDispose(service.dispose);
   return service;
 });
 
 final firestoreServiceProvider = Provider<FirestoreService>(
-  (ref) => FirestoreService(),
+  (ref) => FirestoreService(
+    useFirestore: kUseFirebaseBackend,
+    collectionPath: kTripsCollectionPath,
+  ),
 );
 
 final tripRepositoryProvider = Provider<TripRepository>((ref) {
