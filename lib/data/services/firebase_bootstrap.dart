@@ -1,5 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 
+import '../../firebase_options.dart';
+
 class FirebaseBootstrap {
   FirebaseBootstrap._();
 
@@ -16,7 +18,9 @@ class FirebaseBootstrap {
         return true;
       }
 
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
       return true;
     } catch (_) {
       return false;

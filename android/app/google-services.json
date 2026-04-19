@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "890593335603",
+    "project_id": "gasplit-e0299",
+    "storage_bucket": "gasplit-e0299.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:890593335603:android:0b54b853869be42e238646",
+        "android_client_info": {
+          "package_name": "com.example.gasplit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7rqSt6Z9VF9s84y5gB73rjMEXbhhd06o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

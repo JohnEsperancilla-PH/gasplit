@@ -7,6 +7,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../data/models/live_trip_state.dart';
 import '../../../data/models/trip_session_config.dart';
 import '../../../data/models/trip_summary_data.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../providers/history_provider.dart';
 import '../../../providers/trip_provider.dart';
 
@@ -47,9 +48,15 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => context.go('/'),
+                    onPressed: () async {
+                      await ref.read(authControllerProvider).signOut();
+                      if (!context.mounted) {
+                        return;
+                      }
+                      context.go('/');
+                    },
                     icon: const Icon(Icons.logout_rounded),
-                    tooltip: 'Logout',
+                    tooltip: AppStrings.homeLogoutTooltip,
                   ),
                 ],
               ),
