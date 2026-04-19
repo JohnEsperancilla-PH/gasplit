@@ -58,6 +58,22 @@ void main() {
     expect(find.text(AppStrings.startTripGasPriceLabel), findsOneWidget);
   });
 
+  testWidgets('home recent trip tile opens trip summary', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Roxas Ave -> SM City'));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.tripSummaryTitle), findsOneWidget);
+    expect(find.text(AppStrings.tripSummaryShareButton), findsOneWidget);
+  });
+
   testWidgets('start trip shows validation when passenger is not selected', (
     WidgetTester tester,
   ) async {
