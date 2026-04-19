@@ -4,8 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../data/models/live_trip_state.dart';
+import '../../../data/models/trip_session_config.dart';
 import '../../../data/models/trip_summary_data.dart';
 import '../../../providers/history_provider.dart';
+import '../../../providers/trip_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -13,6 +16,8 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
+    final activeTrip = ref.watch(tripProvider);
+    final hasActiveTrip = activeTrip.isActive;
     final trips = _buildHomeTrips(ref.watch(recentTripsProvider));
 
     return Scaffold(
@@ -52,9 +57,27 @@ class HomeScreen extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () => context.go('/trip/start'),
-                  icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text(AppStrings.homeStartTripButton),
+                  onPressed: () {
+                    if (hasActiveTrip) {
+                      context.go(
+                        '/trip/live',
+                        extra: _configFromLiveTrip(activeTrip),
+                      );
+                      return;
+                    }
+
+                    context.go('/trip/start');
+                  },
+                  icon: Icon(
+                    hasActiveTrip
+                        ? Icons.play_circle_fill_rounded
+                        : Icons.play_arrow_rounded,
+                  ),
+                  label: Text(
+                    hasActiveTrip
+                        ? AppStrings.homeResumeTripButton
+                        : AppStrings.homeStartTripButton,
+                  ),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
                     backgroundColor: AppColors.primaryAccent,
@@ -65,6 +88,10 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
               ),
+              if (hasActiveTrip) ...[
+                const SizedBox(height: 12),
+                _ActiveTripCard(trip: activeTrip),
+              ],
               const SizedBox(height: 18),
               Row(
                 children: [
@@ -139,6 +166,50 @@ class _HomeEmptyState extends StatelessWidget {
   }
 }
 
+class _ActiveTripCard extends StatelessWidget {
+  const _ActiveTripCard({required this.trip});
+
+  final LiveTripState trip;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(AppStrings.homeActiveTripTitle, style: textTheme.titleMedium),
+            const SizedBox(height: 4),
+            Text(
+              AppStrings.homeActiveTripSubtitle,
+              style: textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 12,
+              runSpacing: 6,
+              children: [
+                Text(
+                  '${AppStrings.homeActiveTripDistanceLabel}: ${trip.distanceKm.toStringAsFixed(2)} km',
+                  style: textTheme.bodyLarge,
+                ),
+                Text(
+                  '${AppStrings.homeActiveTripTotalLabel}: ${_formatPeso(trip.totalCost)}',
+                  style: textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _TripHistoryTile extends StatelessWidget {
   const _TripHistoryTile({required this.trip, required this.onTap});
 
@@ -198,6 +269,14 @@ class _HomeTripInfo {
 
 List<_HomeTripInfo> _buildHomeTrips(List<TripSummaryData> recentTrips) {
   return recentTrips.map(_homeTripFromSummary).toList(growable: false);
+}
+
+TripSessionConfig _configFromLiveTrip(LiveTripState trip) {
+  return TripSessionConfig(
+    fuelEfficiencyKmPerLiter: trip.fuelEfficiencyKmPerLiter,
+    gasPricePerLiter: trip.gasPricePerLiter,
+    passengerCount: trip.passengerCount,
+  );
 }
 
 _HomeTripInfo _homeTripFromSummary(TripSummaryData summary) {

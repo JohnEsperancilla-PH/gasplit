@@ -149,6 +149,23 @@ class _StartTripScreenState extends ConsumerState<StartTripScreen>
   }
 
   Future<void> _onStartTrip() async {
+    final activeTrip = ref.read(tripProvider);
+    if (activeTrip.isActive) {
+      if (!mounted) {
+        return;
+      }
+
+      context.go(
+        '/trip/live',
+        extra: TripSessionConfig(
+          fuelEfficiencyKmPerLiter: activeTrip.fuelEfficiencyKmPerLiter,
+          gasPricePerLiter: activeTrip.gasPricePerLiter,
+          passengerCount: activeTrip.passengerCount,
+        ),
+      );
+      return;
+    }
+
     final fuelEfficiency = double.tryParse(_fuelController.text.trim());
     final gasPrice = double.tryParse(_gasPriceController.text.trim());
 

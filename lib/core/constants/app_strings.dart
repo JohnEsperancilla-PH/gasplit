@@ -12,6 +12,12 @@ class AppStrings {
 
   static const homeGreeting = 'Good day, Driver';
   static const homeStartTripButton = 'Start a new trip';
+  static const homeResumeTripButton = 'Resume active trip';
+  static const homeActiveTripTitle = 'Trip in progress';
+  static const homeActiveTripSubtitle =
+      'Distance and gas split continue updating while you are away.';
+  static const homeActiveTripDistanceLabel = 'Distance';
+  static const homeActiveTripTotalLabel = 'Running total';
   static const homeHistoryTitle = 'Trip History';
   static const homeHistoryCta = 'View all';
   static const homeEmptyState = 'No trips yet. Start your first trip today.';
@@ -50,6 +56,8 @@ class AppStrings {
   static const liveMeterEndDialogTitle = 'End this trip?';
   static const liveMeterEndDialogMessage =
       'This will stop live updates and open the trip summary.';
+  static const liveMeterGoHomeTooltip = 'Go to Home';
+  static const liveMeterBackHomeButton = 'Back to Home';
   static const liveMeterFormulaTitle = 'Gas Formula';
   static const liveMeterFormulaGasUsed = 'Gas used';
   static const liveMeterFormulaFuel = 'Fuel efficiency';
