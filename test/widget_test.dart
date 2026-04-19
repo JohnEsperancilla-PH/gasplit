@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:gasplit/app.dart';
@@ -180,6 +181,86 @@ void main() {
     expect(find.text(AppStrings.tripSummaryTitle), findsOneWidget);
     expect(find.text('Roxas Ave -> SM City'), findsOneWidget);
     expect(find.text(AppStrings.tripSummaryShareButton), findsOneWidget);
+  });
+
+  testWidgets('history passenger filter narrows visible trips', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.homeHistoryCta));
+    await tester.pumpAndSettle();
+
+    final summaryCard = find.byKey(const Key('history_summary_card'));
+    expect(summaryCard, findsOneWidget);
+    expect(
+      find.descendant(
+        of: summaryCard,
+        matching: find.text(AppStrings.historySummaryTitle),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(of: summaryCard, matching: find.text('Trips: 7')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: summaryCard,
+        matching: find.text('Distance: 53.5 km'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: summaryCard,
+        matching: find.text('Total: PHP 646.90'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: summaryCard,
+        matching: find.text('Avg share: PHP 28.09'),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.ensureVisible(find.text(AppStrings.historyFilter5Plus));
+    await tester.tap(find.text(AppStrings.historyFilter5Plus));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Azuela Cove -> Buhangin'), findsOneWidget);
+    expect(find.text('Roxas Ave -> SM City'), findsNothing);
+    expect(
+      find.descendant(of: summaryCard, matching: find.text('Trips: 1')),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: summaryCard,
+        matching: find.text('Distance: 10.2 km'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: summaryCard,
+        matching: find.text('Total: PHP 136.00'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: summaryCard,
+        matching: find.text('Avg share: PHP 27.20'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('trip summary share preview shows share action', (
