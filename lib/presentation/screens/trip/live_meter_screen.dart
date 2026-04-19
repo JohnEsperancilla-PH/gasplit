@@ -59,6 +59,13 @@ class _LiveMeterScreenState extends ConsumerState<LiveMeterScreen>
       appBar: AppBar(
         title: const Text(AppStrings.liveMeterTitle),
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            onPressed: () => context.go('/home'),
+            icon: const Icon(Icons.home_outlined),
+            tooltip: AppStrings.liveMeterGoHomeTooltip,
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -138,6 +145,20 @@ class _LiveMeterScreenState extends ConsumerState<LiveMeterScreen>
                 ),
               ),
               const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => context.go('/home'),
+                  icon: const Icon(Icons.home_outlined),
+                  label: const Text(AppStrings.liveMeterBackHomeButton),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                    side: const BorderSide(color: AppColors.border, width: 1),
+                    foregroundColor: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

@@ -115,6 +115,37 @@ void main() {
     expect(find.text(AppStrings.liveMeterEndTripButton), findsOneWidget);
   });
 
+  testWidgets('active trip can be resumed from home', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.homeStartTripButton));
+    await _pumpUntilFound(tester, find.text(AppStrings.startTripTitle));
+
+    await tester.tap(find.text('3'));
+    await tester.pump();
+
+    await tester.tap(find.text(AppStrings.startTripButton));
+    await _pumpUntilFound(tester, find.text(AppStrings.liveMeterTitle));
+
+    await tester.tap(find.text(AppStrings.liveMeterBackHomeButton));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.homeResumeTripButton), findsOneWidget);
+    expect(find.text(AppStrings.homeActiveTripTitle), findsOneWidget);
+
+    await tester.tap(find.text(AppStrings.homeResumeTripButton));
+    await _pumpUntilFound(tester, find.text(AppStrings.liveMeterTitle));
+
+    expect(find.text(AppStrings.liveMeterTitle), findsOneWidget);
+    expect(find.text(AppStrings.liveMeterEndTripButton), findsOneWidget);
+  });
+
   testWidgets('view all navigates to history screen', (
     WidgetTester tester,
   ) async {
