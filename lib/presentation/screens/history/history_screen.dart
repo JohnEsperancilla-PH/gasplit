@@ -83,6 +83,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   Widget build(BuildContext context) {
     final allTrips = ref.watch(mergedHistoryProvider);
     final filteredTrips = _filterTrips(allTrips);
+    final summaryStats = _buildSummaryStats(filteredTrips);
     _latestFilteredCount = filteredTrips.length;
     final visibleTrips = filteredTrips.take(_visibleCount).toList();
 
@@ -188,6 +189,8 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   ),
                 ],
               ),
+              const SizedBox(height: 10),
+              _HistorySummaryCard(stats: summaryStats),
               const SizedBox(height: 12),
               Expanded(
                 child: filteredTrips.isEmpty
@@ -261,9 +264,92 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       _visibleCount = 5;
     });
   }
+
+  _HistorySummaryStats _buildSummaryStats(List<TripSummaryData> trips) {
+    var totalCost = 0.0;
+    var totalDistance = 0.0;
+    var totalShare = 0.0;
+
+    for (final trip in trips) {
+      totalCost += trip.totalCost;
+      totalDistance += trip.distanceKm;
+      totalShare += trip.perPersonShare;
+    }
+
+    final averageShare = trips.isEmpty ? 0.0 : totalShare / trips.length;
+
+    return _HistorySummaryStats(
+      tripCount: trips.length,
+      totalCost: totalCost,
+      totalDistanceKm: totalDistance,
+      averagePerPersonShare: averageShare,
+    );
+  }
 }
 
 enum _PassengerFilter { all, upTo2, between3And4, atLeast5 }
+
+class _HistorySummaryStats {
+  const _HistorySummaryStats({
+    required this.tripCount,
+    required this.totalCost,
+    required this.totalDistanceKm,
+    required this.averagePerPersonShare,
+  });
+
+  final int tripCount;
+  final double totalCost;
+  final double totalDistanceKm;
+  final double averagePerPersonShare;
+}
+
+class _HistorySummaryCard extends StatelessWidget {
+  const _HistorySummaryCard({required this.stats});
+
+  final _HistorySummaryStats stats;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Card(
+      key: const Key('history_summary_card'),
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(AppStrings.historySummaryTitle, style: textTheme.titleMedium),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 10,
+              runSpacing: 6,
+              children: [
+                Text(
+                  '${AppStrings.historySummaryTripsLabel}: ${stats.tripCount}',
+                  style: textTheme.bodyLarge,
+                ),
+                Text(
+                  '${AppStrings.historySummaryDistanceLabel}: ${stats.totalDistanceKm.toStringAsFixed(1)} km',
+                  style: textTheme.bodyLarge,
+                ),
+                Text(
+                  '${AppStrings.historySummaryTotalLabel}: ${_formatPeso(stats.totalCost)}',
+                  style: textTheme.bodyLarge,
+                ),
+                Text(
+                  '${AppStrings.historySummaryAverageShareLabel}: ${_formatPeso(stats.averagePerPersonShare)}',
+                  style: textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _PassengerFilterChip extends StatelessWidget {
   const _PassengerFilterChip({

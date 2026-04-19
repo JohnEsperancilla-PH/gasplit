@@ -98,6 +98,11 @@ class AppStrings {
   static const historyFilter5Plus = '5+ pax';
   static const historySortNewestTooltip = 'Sort: newest first';
   static const historySortOldestTooltip = 'Sort: oldest first';
+  static const historySummaryTitle = 'Filtered summary';
+  static const historySummaryTripsLabel = 'Trips';
+  static const historySummaryDistanceLabel = 'Distance';
+  static const historySummaryTotalLabel = 'Total';
+  static const historySummaryAverageShareLabel = 'Avg share';
   static const historyEmptyFiltered = 'No trips match your search.';
   static const historyEmptyAll = 'No trips saved yet.';
   static const historyPassengersLabel = 'Passengers';
