@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/models/trip_session_config.dart';
+import '../../../data/models/trip_summary_data.dart';
 
 class LiveMeterScreen extends StatefulWidget {
   const LiveMeterScreen({required this.config, super.key});
@@ -218,8 +219,24 @@ class _LiveMeterScreenState extends State<LiveMeterScreen>
       return;
     }
 
-    final tripId = 'trip_${DateTime.now().millisecondsSinceEpoch}';
-    context.go('/trip/summary/$tripId');
+    final endedAt = DateTime.now();
+    final tripId = 'trip_${endedAt.millisecondsSinceEpoch}';
+    final summaryData = TripSummaryData(
+      tripId: tripId,
+      routeLabel: 'Current route',
+      startedAt: _startedAt,
+      endedAt: endedAt,
+      distanceKm: _distanceKm,
+      duration: _tripStopwatch.elapsed,
+      fuelEfficiencyKmPerLiter: widget.config.fuelEfficiencyKmPerLiter,
+      gasPricePerLiter: widget.config.gasPricePerLiter,
+      gasUsedLiters: _gasUsedLiters,
+      totalCost: _totalCost,
+      passengerCount: widget.config.passengerCount,
+      perPersonShare: _perPersonShare,
+    );
+
+    context.go('/trip/summary/$tripId', extra: summaryData);
   }
 
   void _showFormulaBottomSheet() {
