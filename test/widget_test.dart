@@ -26,6 +26,7 @@ void main() {
     expect(find.text(AppStrings.appName), findsOneWidget);
     expect(find.text(AppStrings.authGoogleButton), findsOneWidget);
     expect(find.text(AppStrings.authEmailButton), findsOneWidget);
+    expect(find.text('Roxas Ave -> SM City'), findsOneWidget);
   });
 
   testWidgets('google button navigates to home screen', (

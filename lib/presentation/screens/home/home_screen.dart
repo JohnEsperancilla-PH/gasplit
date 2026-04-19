@@ -13,7 +13,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
-    final trips = _buildHomeTrips(ref.watch(historyProvider));
+    final trips = _buildHomeTrips(ref.watch(recentTripsProvider));
 
     return Scaffold(
       body: SafeArea(
@@ -196,15 +196,8 @@ class _HomeTripInfo {
   final TripSummaryData? summaryData;
 }
 
-List<_HomeTripInfo> _buildHomeTrips(List<TripSummaryData> savedTrips) {
-  if (savedTrips.isEmpty) {
-    return _demoTrips;
-  }
-
-  final sortedTrips = List<TripSummaryData>.from(savedTrips)
-    ..sort((a, b) => b.endedAt.compareTo(a.endedAt));
-
-  return sortedTrips.take(3).map(_homeTripFromSummary).toList();
+List<_HomeTripInfo> _buildHomeTrips(List<TripSummaryData> recentTrips) {
+  return recentTrips.map(_homeTripFromSummary).toList(growable: false);
 }
 
 _HomeTripInfo _homeTripFromSummary(TripSummaryData summary) {
@@ -251,27 +244,3 @@ String _formatDateTime(DateTime value) {
 String _formatPeso(double amount) {
   return 'PHP ${amount.toStringAsFixed(2)}';
 }
-
-const _demoTrips = <_HomeTripInfo>[
-  _HomeTripInfo(
-    tripId: 'trip_20260417_1',
-    route: 'Roxas Ave -> SM City',
-    meta: 'Apr 17, 2026 6:12 PM - 3 pax - 6.2 km',
-    total: 'PHP 73.80',
-    share: 'PHP 24.60',
-  ),
-  _HomeTripInfo(
-    tripId: 'trip_20260415_1',
-    route: 'Lanang -> Abreeza',
-    meta: 'Apr 15, 2026 7:38 AM - 2 pax - 4.1 km',
-    total: 'PHP 38.80',
-    share: 'PHP 19.40',
-  ),
-  _HomeTripInfo(
-    tripId: 'trip_20260416_1',
-    route: 'Bajada -> Matina',
-    meta: 'Apr 16, 2026 8:05 AM - 4 pax - 8.4 km',
-    total: 'PHP 108.60',
-    share: 'PHP 27.15',
-  ),
-];

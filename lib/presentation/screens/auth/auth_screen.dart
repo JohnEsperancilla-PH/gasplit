@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../data/models/trip_summary_data.dart';
+import '../../../providers/history_provider.dart';
 
-class AuthScreen extends StatelessWidget {
+class AuthScreen extends ConsumerWidget {
   const AuthScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
+    final recentTrips = _buildRecentTrips(ref.watch(recentTripsProvider));
 
     return Scaffold(
       body: SafeArea(
@@ -84,7 +88,7 @@ class AuthScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              ..._demoTrips.map(_RecentTripTile.new),
+              ...recentTrips.map(_RecentTripTile.new),
             ],
           ),
         ),
@@ -177,20 +181,48 @@ class _RecentTripTile extends StatelessWidget {
   }
 }
 
-const _demoTrips = <_RecentTripInfo>[
-  _RecentTripInfo(
-    route: 'Roxas Ave -> SM City',
-    meta: 'Apr 17, 2026 - 3 pax - 6.2 km',
-    share: 'PHP 24.60',
-  ),
-  _RecentTripInfo(
-    route: 'Lanang -> Abreeza',
-    meta: 'Apr 15, 2026 - 2 pax - 4.1 km',
-    share: 'PHP 19.40',
-  ),
-  _RecentTripInfo(
-    route: 'Bajada -> Matina',
-    meta: 'Apr 11, 2026 - 4 pax - 8.4 km',
-    share: 'PHP 27.15',
-  ),
-];
+List<_RecentTripInfo> _buildRecentTrips(List<TripSummaryData> recentTrips) {
+  return recentTrips.map(_recentTripFromSummary).toList(growable: false);
+}
+
+_RecentTripInfo _recentTripFromSummary(TripSummaryData summary) {
+  final routeLabel = summary.routeLabel.trim().isEmpty
+      ? AppStrings.tripSummaryRouteFallback
+      : summary.routeLabel;
+
+  return _RecentTripInfo(
+    route: routeLabel,
+    meta:
+        '${_formatDateTime(summary.endedAt)} - ${summary.passengerCount} pax - ${summary.distanceKm.toStringAsFixed(1)} km',
+    share: _formatPeso(summary.perPersonShare),
+  );
+}
+
+String _formatDateTime(DateTime value) {
+  const months = <String>[
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  final month = months[value.month - 1];
+  final hour24 = value.hour;
+  final hour12 = hour24 % 12 == 0 ? 12 : hour24 % 12;
+  final minute = value.minute.toString().padLeft(2, '0');
+  final period = hour24 >= 12 ? 'PM' : 'AM';
+
+  return '$month ${value.day}, ${value.year} $hour12:$minute $period';
+}
+
+String _formatPeso(double amount) {
+  return 'PHP ${amount.toStringAsFixed(2)}';
+}
