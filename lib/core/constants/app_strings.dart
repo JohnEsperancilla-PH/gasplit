@@ -58,7 +58,26 @@ class AppStrings {
   static const liveMeterFormulaTotal = 'Total cost';
   static const liveMeterFormulaPerPerson = 'Per-person share';
 
+  static const tripSummaryTitle = 'Trip Summary';
+  static const tripSummaryCompletedLabel = 'Trip completed';
+  static const tripSummaryDetailsTitle = 'Trip details';
+  static const tripSummaryPassengerBreakdownTitle = 'Per-passenger breakdown';
+  static const tripSummaryDistanceLabel = 'Distance';
+  static const tripSummaryDurationLabel = 'Duration';
+  static const tripSummaryGasUsedLabel = 'Gas used';
+  static const tripSummaryFuelReferenceLabel = 'Fuel & gas price';
+  static const tripSummaryShareButton = 'Share Breakdown';
+  static const tripSummarySaveButton = 'Save to History';
+  static const tripSummarySavedButton = 'Saved to History';
+  static const tripSummarySavedSnack = 'Trip saved to history.';
+  static const tripSummarySharePreviewTitle = 'Share trip summary';
+  static const tripSummaryCopyButton = 'Copy text';
+  static const tripSummaryCopiedSnack = 'Summary text copied.';
+  static const tripSummaryRouteFallback = 'Route unavailable';
+  static const tripSummaryPoweredBy = 'Powered by GaSplit';
+
   static const commonCancel = 'Cancel';
+  static const commonClose = 'Close';
 
   static const historyTitle = 'Trip History';
   static const historySearchHint = 'Search by date or route';

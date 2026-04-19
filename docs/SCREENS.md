@@ -136,7 +136,7 @@ The core screen of the app. Displays the live gas meter and per-person split.
 
 **Route:** `/trip/summary/:tripId`
 
-**Status:** Pending (placeholder screen currently)
+**Status:** Implemented (UI + local share preview/copy + save stub)
 
 Shown immediately after a trip ends, and also accessible from history.
 
@@ -158,8 +158,8 @@ Shown immediately after a trip ends, and also accessible from history.
 - Driver tile uses green accent
 
 **Action buttons**
-- "Share Breakdown" (amber, full-width) — generates a plain-text summary and opens the system share sheet
-- "Save to History" (outlined) — saves to Firestore if not already saved
+- "Share Breakdown" (amber, full-width) — generates plain-text summary with copy-ready preview
+- "Save to History" (outlined) — local stub action while Firestore integration is pending
 
 ### Share Text Format
 
@@ -206,7 +206,7 @@ A full list of all completed trips for the logged-in driver.
 
 ## Formula Bottom Sheet
 
-**Status:** Pending (not yet implemented)
+**Status:** Implemented (available from live meter total cost label)
 
 Accessible by tapping the total cost on the Live Meter screen.
 

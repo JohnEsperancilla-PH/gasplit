@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 
 import '../../data/models/trip_session_config.dart';
+import '../../data/models/trip_summary_data.dart';
 import '../../presentation/screens/auth/auth_screen.dart';
 import '../../presentation/screens/history/history_screen.dart';
 import '../../presentation/screens/home/home_screen.dart';
@@ -37,7 +38,10 @@ class AppRouter {
           path: '/trip/summary/:id',
           builder: (context, state) {
             final tripId = state.pathParameters['id'] ?? '';
-            return TripSummaryScreen(tripId: tripId);
+            final initialData = state.extra is TripSummaryData
+                ? state.extra! as TripSummaryData
+                : null;
+            return TripSummaryScreen(tripId: tripId, initialData: initialData);
           },
         ),
         GoRoute(
