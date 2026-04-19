@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../data/models/trip_summary_data.dart';
+import '../../../providers/history_provider.dart';
 
-class TripSummaryScreen extends StatefulWidget {
+class TripSummaryScreen extends ConsumerStatefulWidget {
   const TripSummaryScreen({required this.tripId, this.initialData, super.key});
 
   final String tripId;
   final TripSummaryData? initialData;
 
   @override
-  State<TripSummaryScreen> createState() => _TripSummaryScreenState();
+  ConsumerState<TripSummaryScreen> createState() => _TripSummaryScreenState();
 }
 
-class _TripSummaryScreenState extends State<TripSummaryScreen> {
+class _TripSummaryScreenState extends ConsumerState<TripSummaryScreen> {
   late final TripSummaryData _summary;
   bool _savedToHistory = false;
 
@@ -27,6 +29,11 @@ class _TripSummaryScreenState extends State<TripSummaryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final hasSavedRecord = ref
+        .watch(historyProvider)
+        .any((trip) => trip.tripId == _summary.tripId);
+    final isSaved = _savedToHistory || hasSavedRecord;
+
     return Scaffold(
       appBar: AppBar(title: const Text(AppStrings.tripSummaryTitle)),
       body: SafeArea(
@@ -56,14 +63,14 @@ class _TripSummaryScreenState extends State<TripSummaryScreen> {
               ),
               const SizedBox(height: 10),
               OutlinedButton.icon(
-                onPressed: _savedToHistory ? null : _onSaveToHistory,
+                onPressed: isSaved ? null : _onSaveToHistory,
                 icon: Icon(
-                  _savedToHistory
+                  isSaved
                       ? Icons.check_circle_rounded
                       : Icons.bookmark_add_outlined,
                 ),
                 label: Text(
-                  _savedToHistory
+                  isSaved
                       ? AppStrings.tripSummarySavedButton
                       : AppStrings.tripSummarySaveButton,
                 ),
@@ -155,8 +162,14 @@ class _TripSummaryScreenState extends State<TripSummaryScreen> {
     );
   }
 
-  void _onSaveToHistory() {
+  Future<void> _onSaveToHistory() async {
     if (_savedToHistory) {
+      return;
+    }
+
+    await ref.read(historyProvider.notifier).saveTrip(_summary);
+
+    if (!mounted) {
       return;
     }
 

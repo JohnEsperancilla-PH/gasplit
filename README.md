@@ -15,7 +15,7 @@ Last updated: April 19, 2026
 | History screen | Done | Search/filter, list, refresh, summary-route navigation |
 | Live meter screen | Done | Real-time UI, formula sheet, passenger split, end-trip flow |
 | Trip summary screen | Done | Summary hero, details, passenger breakdown, share/save actions |
-| Firebase/GPS data integration | In Progress | Trip provider + repository/services wired with simulated GPS + in-memory sync |
+| Firebase/GPS data integration | In Progress | Trip + history providers wired with repository/services, in-memory sync, and summary save-to-history flow |
 
 ## Quick Links
 

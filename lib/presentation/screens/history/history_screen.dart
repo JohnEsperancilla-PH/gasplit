@@ -1,27 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_strings.dart';
+import '../../../data/models/trip_summary_data.dart';
+import '../../../providers/history_provider.dart';
 
-class HistoryScreen extends StatefulWidget {
+class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
+  ConsumerState<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class _HistoryScreenState extends State<HistoryScreen> {
+class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  late final List<_HistoryTrip> _trips;
 
   int _visibleCount = 5;
+  int _latestFilteredCount = 0;
 
   @override
   void initState() {
     super.initState();
-    _trips = List<_HistoryTrip>.from(_seedTrips)
-      ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
     _scrollController.addListener(_handleScroll);
   }
 
@@ -32,13 +33,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
     super.dispose();
   }
 
-  List<_HistoryTrip> get _filteredTrips {
+  List<_HistoryTrip> _filterTrips(List<_HistoryTrip> trips) {
     final query = _searchController.text.trim().toLowerCase();
     if (query.isEmpty) {
-      return _trips;
+      return trips;
     }
 
-    return _trips.where((trip) {
+    return trips.where((trip) {
       final route = trip.route.toLowerCase();
       final date = _formatDateTime(trip.dateTime).toLowerCase();
       return route.contains(query) || date.contains(query);
@@ -47,7 +48,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredTrips = _filteredTrips;
+    final savedTrips = ref.watch(historyProvider);
+    final allTrips = _buildAllTrips(savedTrips);
+    final filteredTrips = _filterTrips(allTrips);
+    _latestFilteredCount = filteredTrips.length;
     final visibleTrips = filteredTrips.take(_visibleCount).toList();
 
     return Scaffold(
@@ -105,8 +109,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             final trip = visibleTrips[index];
                             return _HistoryTripTile(
                               trip: trip,
-                              onTap: () =>
-                                  context.go('/trip/summary/${trip.tripId}'),
+                              onTap: () => context.go(
+                                '/trip/summary/${trip.tripId}',
+                                extra: trip.summaryData,
+                              ),
                             );
                           },
                         ),
@@ -120,7 +126,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _handleScroll() {
-    final filteredCount = _filteredTrips.length;
+    final filteredCount = _latestFilteredCount;
     if (filteredCount <= _visibleCount) {
       return;
     }
@@ -133,14 +139,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Future<void> _refresh() async {
-    await Future<void>.delayed(const Duration(milliseconds: 350));
+    await ref.read(historyProvider.notifier).refresh();
     if (!mounted) {
       return;
     }
     setState(() {
-      _trips.sort((a, b) => b.dateTime.compareTo(a.dateTime));
       _visibleCount = 5;
     });
+  }
+
+  List<_HistoryTrip> _buildAllTrips(List<TripSummaryData> savedTrips) {
+    final mergedById = <String, _HistoryTrip>{
+      for (final trip in savedTrips) trip.tripId: _historyTripFromSummary(trip),
+    };
+
+    for (final trip in _seedTrips) {
+      mergedById.putIfAbsent(trip.tripId, () => trip);
+    }
+
+    final merged = mergedById.values.toList()
+      ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    return merged;
   }
 }
 
@@ -222,6 +241,7 @@ class _HistoryTrip {
     required this.durationText,
     required this.totalCostText,
     required this.perPersonText,
+    this.summaryData,
   });
 
   final String tripId;
@@ -232,6 +252,25 @@ class _HistoryTrip {
   final String durationText;
   final String totalCostText;
   final String perPersonText;
+  final TripSummaryData? summaryData;
+}
+
+_HistoryTrip _historyTripFromSummary(TripSummaryData summary) {
+  final route = summary.routeLabel.trim().isEmpty
+      ? AppStrings.tripSummaryRouteFallback
+      : summary.routeLabel;
+
+  return _HistoryTrip(
+    tripId: summary.tripId,
+    route: route,
+    dateTime: summary.endedAt,
+    passengerCount: summary.passengerCount,
+    distanceKm: summary.distanceKm,
+    durationText: _formatDuration(summary.duration),
+    totalCostText: _formatPeso(summary.totalCost),
+    perPersonText: _formatPeso(summary.perPersonShare),
+    summaryData: summary,
+  );
 }
 
 String _formatDateTime(DateTime value) {
@@ -257,6 +296,20 @@ String _formatDateTime(DateTime value) {
   final period = hour24 >= 12 ? 'PM' : 'AM';
 
   return '$month ${value.day}, ${value.year} $hour12:$minute $period';
+}
+
+String _formatDuration(Duration value) {
+  if (value.inHours > 0) {
+    final minutes = value.inMinutes.remainder(60).toString().padLeft(2, '0');
+    return '${value.inHours}h ${minutes}m';
+  }
+
+  final minutes = value.inMinutes <= 0 ? 1 : value.inMinutes;
+  return '$minutes min';
+}
+
+String _formatPeso(double amount) {
+  return 'PHP ${amount.toStringAsFixed(2)}';
 }
 
 final _seedTrips = <_HistoryTrip>[
