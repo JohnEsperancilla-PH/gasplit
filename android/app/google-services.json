@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "890593335603",
+    "firebase_url": "https://gasplit-e0299-default-rtdb.firebaseio.com",
     "project_id": "gasplit-e0299",
     "storage_bucket": "gasplit-e0299.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.gasplit"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "890593335603-roo4jef0dou80p5b4903hs6n28kc32g6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gasplit",
+            "certificate_hash": "c7e8a5fb2f7bdf9b3980ed1a7501c1bb5d4ad4f4"
+          }
+        },
+        {
+          "client_id": "890593335603-ncg7985g6btecqmoep1i4k37n5ecg9e1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA7rqSt6Z9VF9s84y5gB73rjMEXbhhd06o"
@@ -20,7 +34,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "890593335603-ncg7985g6btecqmoep1i4k37n5ecg9e1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "890593335603-mr8an3ksmavttsr758h9tair3ulg8sp7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.gasplit"
+              }
+            }
+          ]
         }
       }
     }

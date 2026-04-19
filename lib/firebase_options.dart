@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'gasplit-e0299.firebasestorage.app',
     measurementId: 'G-YDR1FRX7DM',
   );
+
 }

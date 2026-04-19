@@ -196,18 +196,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users can only read and write their own profile
+    // Users can only read and write their own profile/trip subtree
     match /users/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
-    }
 
-    // Trips can only be read and written by the driver
-    match /trips/{tripId} {
-      allow read, write: if request.auth != null
-        && request.auth.uid == resource.data.driverId;
-
-      allow create: if request.auth != null
-        && request.auth.uid == request.resource.data.driverId;
+      // Trip summaries are stored under users/{uid}/trips/{tripId}
+      match /trips/{tripId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
     }
   }
 }

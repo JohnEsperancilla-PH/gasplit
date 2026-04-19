@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../../core/constants/backend_config.dart';
 import '../models/auth_user.dart';
 import 'firebase_bootstrap.dart';
 
@@ -19,6 +21,7 @@ class AuthService {
 
   AuthUser? _localCurrentUser;
   Future<bool>? _firebaseAvailability;
+  Future<void>? _googleSignInInitialization;
 
   Stream<AuthUser?> authStateChanges() async* {
     final canUseFirebase = await _isFirebaseAvailable();
@@ -35,7 +38,7 @@ class AuthService {
   Future<AuthUser?> signInWithGoogle() async {
     final canUseFirebase = await _isFirebaseAvailable();
     if (canUseFirebase) {
-      await _googleSignIn.initialize();
+      await _ensureGoogleSignInInitialized();
       final googleAccount = await _googleSignIn.authenticate();
       final googleAuthentication = googleAccount.authentication;
       final credential = GoogleAuthProvider.credential(
@@ -155,6 +158,27 @@ class AuthService {
     }
 
     return true;
+  }
+
+  Future<void> _ensureGoogleSignInInitialized() {
+    _googleSignInInitialization ??= _initializeGoogleSignIn();
+    return _googleSignInInitialization!;
+  }
+
+  Future<void> _initializeGoogleSignIn() async {
+    final serverClientId = kGoogleServerClientId.trim();
+    if (!kIsWeb &&
+        defaultTargetPlatform == TargetPlatform.android &&
+        serverClientId.isEmpty) {
+      throw Exception(
+        'Google Sign-In on Android requires GOOGLE_SERVER_CLIENT_ID. '
+        'Use the Web OAuth client ID from Firebase/Google Cloud credentials.',
+      );
+    }
+
+    await _googleSignIn.initialize(
+      serverClientId: serverClientId.isEmpty ? null : serverClientId,
+    );
   }
 
   AuthUser? _mapFirebaseUser(User? user) {

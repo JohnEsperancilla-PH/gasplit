@@ -103,6 +103,30 @@ flutterfire configure
 
 This generates `lib/firebase_options.dart` automatically.
 
+### 3.6 Enable Backend Mode And Deploy Rules
+
+The app defaults to local fallback mode. Enable Firebase-backed data paths by
+running with:
+
+```bash
+flutter run --dart-define=USE_FIREBASE_BACKEND=true
+```
+
+For Android Google Sign-In (`google_sign_in` v7+), also pass your Web OAuth
+client ID as `GOOGLE_SERVER_CLIENT_ID`:
+
+```bash
+flutter run \
+  --dart-define=USE_FIREBASE_BACKEND=true \
+  --dart-define=GOOGLE_SERVER_CLIENT_ID=YOUR_WEB_OAUTH_CLIENT_ID
+```
+
+To deploy security rules and indexes from this repository:
+
+```bash
+firebase deploy --only firestore:rules,firestore:indexes,database
+```
+
 ---
 
 ## 4. Google Maps Setup
