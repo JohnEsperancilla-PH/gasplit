@@ -102,4 +102,41 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('view all navigates to history screen', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.homeHistoryCta));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.historyTitle), findsOneWidget);
+    expect(find.text(AppStrings.historySearchHint), findsOneWidget);
+  });
+
+  testWidgets('history tile opens trip summary route', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: GaSplitApp()));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.authGoogleButton));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppStrings.homeHistoryCta));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Roxas Ave -> SM City'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Summary details for trip ID: trip_20260417_1'),
+      findsOneWidget,
+    );
+  });
 }

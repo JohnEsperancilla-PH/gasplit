@@ -32,4 +32,14 @@ class AppStrings {
       'Select passenger count before starting.';
   static const startTripValidationCustomPassengers =
       'Enter a valid passenger count.';
+
+  static const historyTitle = 'Trip History';
+  static const historySearchHint = 'Search by date or route';
+  static const historyEmptyFiltered = 'No trips match your search.';
+  static const historyEmptyAll = 'No trips saved yet.';
+  static const historyPassengersLabel = 'Passengers';
+  static const historyDistanceLabel = 'Distance';
+  static const historyDurationLabel = 'Duration';
+  static const historyTotalLabel = 'Total';
+  static const historyPerPersonLabel = 'Per person';
 }

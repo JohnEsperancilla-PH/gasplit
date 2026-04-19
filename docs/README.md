@@ -38,6 +38,23 @@ No passenger accounts needed. Driver-only app.
 
 ---
 
+## Implementation Progress
+
+Last updated: April 19, 2026
+
+| Area | Status | Notes |
+|---|---|---|
+| App shell and routing | Done | Riverpod app root, go_router routes, base theme |
+| Auth screen (`/`) | Done | UI and navigation stubs implemented |
+| Home screen (`/home`) | Done | CTA actions, trip preview cards, navigation |
+| Start Journey (`/trip/start`) | Done | Inputs, passenger selector, validation, live navigation |
+| History (`/history`) | Done | Search/filter, pull-to-refresh, summary navigation |
+| Live meter (`/trip/live`) | Pending | Placeholder only |
+| Trip summary (`/trip/summary/:tripId`) | Pending | Placeholder only |
+| Firebase service wiring | Pending | Planned for provider/repository integration |
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
